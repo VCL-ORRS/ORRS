@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 '''
-    Created on wed Sept 22 16:46 2018
+    Created on wed Sept 22 17:48 2018
 
     Author           : Shaoshu Yang
     Email            : 13558615057@163.com
-    Last edit date   : Sept 22 17:48 2018
+    Last edit date   : Sept 22 17:50 2018
 
 South East University Automation College, 211189 Nanjing China
 '''
@@ -17,8 +17,7 @@ import torch.nn as nn
 from src.dataset.RSseti import RSseti
 from src.model.resnet34 import ResNet34
 
-def train(model, root_dir, anno_file, max_epoch, batch_size, lr, momentum,
-                                weight_decay, check_point, weight_file_name):
+def test(model, root_dir, anno_file, max_epoch, batch_size):
     '''
         Args:
              model          : (nn.Module) untrained darknet
@@ -43,9 +42,6 @@ def train(model, root_dir, anno_file, max_epoch, batch_size, lr, momentum,
     # MSE loss function
     mseloss = nn.MSELoss()
 
-    # Set optimizer
-    optimizer = optim.SGD(model.parameters(), lr, momentum, weight_decay=weight_decay)
-
     # Prepare a txt file to restore loss info
     loss_recorder = open('loss_recorder.txt', 'a+')
 
@@ -56,14 +52,8 @@ def train(model, root_dir, anno_file, max_epoch, batch_size, lr, momentum,
                 canvas = canvas.cuda()
                 target = target.cuda()
 
-            # Back propagation
-            optimizer.zero_grad()
-
             output = model(canvas)
             loss = mseloss(output, target)
-            loss.backward()
-
-            optimizer.step()
 
             # Calc recall
             nG = len(target)
@@ -78,16 +68,10 @@ def train(model, root_dir, anno_file, max_epoch, batch_size, lr, momentum,
                   (epoch + 1, max_epoch, idx + 1, len(data_loader), loss.item(), recall))
             loss_recorder.write("loss: %f, recall: %f\n" % (loss.item(), recall))
 
-            if epoch % check_point == 0:
-                torch.save(model.state_dict(), weight_file_name)
-
-    torch.save(model.state_dict(), weight_file_name)
-
 if __name__ == '__main__':
     # Initialize ResNet34
     model = ResNet34(2)
     if torch.cuda.is_available():
         model = model.cuda()
 
-    model.train()
-
+    model.eval()

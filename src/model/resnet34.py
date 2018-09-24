@@ -39,11 +39,11 @@ class ResidualBlock(nn.Module):
             Args:
                  x              : (torch.FloatTensor\torch.cuda.FloatTensor) input tensor
         '''
-        x = self.left(x)
+        x_ = self.left(x)
         residual = x if self.right is None else self.right(x)
-        x += residual
+        x_ += residual
 
-        return x
+        return x_
 
 class ResNet34(nn.Module):
     def __init__(self, num_class):
@@ -101,7 +101,7 @@ class ResNet34(nn.Module):
         x = self.layer3(x)
         x = self.layer4(x)
 
-        x = F.avg_pool2d(x, 7)
+        x = F.avg_pool2d(x, 2)
         x = x.view(x.size(0), -1)
         x = self.fc(x)
 

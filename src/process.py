@@ -33,7 +33,7 @@ class processor():
                  Save target images in self.destdir
         '''
         for i in range(0, len(self.list)):
-            path = os.path.join(self.dir, list[i])
+            path = os.path.join(self.dir, self.list[i])
 
             # Read image if the path points to a file
             if os.path.isfile(path):
@@ -60,12 +60,12 @@ class processor():
                  Print out target images
         '''
         for i in range(0, len(self.list)):
-            path = os.path.join(self.dir, list[i])
+            path = os.path.join(self.dir, self.list[i])
 
             # Read image if the path points to a file
             if os.path.isfile(path):
                 img = cv2.imread(path)
-                img_h, img_w = img.shape[1], img.shape[2]
+                img_h, img_w = img.shape[0], img.shape[1]
 
                 # Generate rotation degree using Gaussian distribution
                 deg_rot = np.random.normal(0, 30, size=1)
@@ -74,7 +74,7 @@ class processor():
 
                 # Generate rotation matrix, perform rotation process
                 Mrot = cv2.getRotationMatrix2D((img_h / 2, img_w / 2), deg_rot, 1.0)
-                img = cv2.warpAffine(img, Mrot, (new_h, new_w), borderValue=(168, 38, 61))
+                img = cv2.warpAffine(img, Mrot, (img_w, img_h), borderValue=(168, 38, 61))
 
                 # Display target image
                 cv2.imshow("target", img)
@@ -88,14 +88,14 @@ class processor():
                  right_bottom      : (list) right-bottom coordinate
         '''
         for i in range(0, len(self.list)):
-            path = os.path.join(self.dir, list[i])
+            path = os.path.join(self.dir, self.list[i])
 
             # Read image if the path points to a file
             if os.path.isfile(path):
-                img = cv2.imread(img)
+                img = cv2.imread(path)
 
                 # Perform cropping process
-                img = img[:, left_top[0]:right_bottom[0], left_top[1]:right_bottom[1]]
+                img = img[left_top[1]:right_bottom[1], left_top[0]:right_bottom[0], :]
 
                 cv2.imwrite(self.destdir + "/%s"%path, img)
 
@@ -106,14 +106,14 @@ class processor():
                  right_bottom      : (list) right-bottom coordinate
         '''
         for i in range(0, len(self.list)):
-            path = os.path.join(self.dir, list[i])
+            path = os.path.join(self.dir, self.list[i])
 
             # Read image if the path points to a file
             if os.path.isfile(path):
-                img = cv2.imread(img)
+                img = cv2.imread(path)
 
                 # Perform cropping process
-                img = img[:, left_top[0]:right_bottom[0], left_top[1]:right_bottom[1]]
+                img = img[left_top[1]:right_bottom[1], left_top[0]:right_bottom[0], :]
 
                 # Display target image
                 cv2.imshow("target", img)
@@ -125,11 +125,11 @@ class processor():
                  flipcode        : (int) defines how to flip
         '''
         for i in range(0, len(self.list)):
-            path = os.path.join(self.dir, list[i])
+            path = os.path.join(self.dir, self.list[i])
 
             # Read image if the path points to a file
             if os.path.isfile(path):
-                img = cv2.imread(img)
+                img = cv2.imread(path)
 
                 # Perform flipping process
                 img = cv2.flip(img, flipCode=flipcode)
@@ -141,11 +141,11 @@ class processor():
                  flipcode        : (int) defines how to flip
         '''
         for i in range(0, len(self.list)):
-            path = os.path.join(self.dir, list[i])
+            path = os.path.join(self.dir, self.list[i])
 
             # Read image if the path points to a file
             if os.path.isfile(path):
-                img = cv2.imread(img)
+                img = cv2.imread(path)
 
                 # Perform flipping process
                 img = cv2.flip(img, flipCode=flipcode)
@@ -160,13 +160,13 @@ class processor():
                  rate           : (float) defines the blurry
         '''
         for i in range(0, len(self.list)):
-            path = os.path.join(self.dir, list[i])
+            path = os.path.join(self.dir, self.list[i])
 
             # Read image if the path points to a file
             if os.path.isfile(path):
-                img = cv2.imread(img)
+                img = cv2.imread(path)
 
-                img_h, img_w = img.shape[1], img.shape[2]
+                img_h, img_w = img.shape[0], img.shape[1]
                 new_h, new_w = int(rate*img_h), int(rate*img_w)
 
                 img = cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_CUBIC)
@@ -181,13 +181,13 @@ class processor():
                  waitkey       : (int) parameter of cv2.waitKey()
         '''
         for i in range(0, len(self.list)):
-            path = os.path.join(self.dir, list[i])
+            path = os.path.join(self.dir, self.list[i])
 
             # Read image if the path points to a file
             if os.path.isfile(path):
-                img = cv2.imread(img)
+                img = cv2.imread(path)
 
-                img_h, img_w = img.shape[1], img.shape[2]
+                img_h, img_w = img.shape[0], img.shape[1]
                 new_h, new_w = int(rate * img_h), int(rate * img_w)
 
                 img = cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_CUBIC)
@@ -197,3 +197,9 @@ class processor():
                 cv2.imshow("target", img)
                 cv2.waitKey(waitkey)
 
+if __name__ == '__main__':
+    test = processor("D:/KailinXu/picture", "D:/KailinXu/target")
+    test.flip_test(1, 100)
+    test.blur_test(0.1, 100)
+    test.rotate_test(1000)
+    #test.crop_test([116,53], [786, 580], 100)
